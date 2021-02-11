@@ -431,7 +431,7 @@ void prepareData()
 
     // --- img fetch --- //
     int img_w, img_h, n_ch;
-    const char *img_path = "./peko.jpg";
+    const char *img_path = "./container.jpg";
     unsigned char *img_data = stbi_load(img_path, &img_w, &img_h, &n_ch, 0);
     // ----------------- //
 
