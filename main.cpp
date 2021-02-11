@@ -76,6 +76,7 @@ float ambientSTR = 1.0f;
 
 // --- diffuse light --- //
 vec3 diffusePos(0.0f, 0.0f, 0.0f);
+float diffuseSTR = 1.0f;
 // --------------------- //
 
 // --- position set --- //
@@ -171,7 +172,7 @@ GLFWwindow *createWindow(int w, int h)
     glewInit();
 
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0, 0, 0, 0);
+    glClearColor(0.3f, 0, 0, 0);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     return window;
@@ -187,6 +188,13 @@ void processInput(GLFWwindow *window)
         ambientSTR += 0.1f;
     if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS)
         ambientSTR -= 0.1f;
+
+    /// diffuse strength
+    if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+        diffuseSTR += 0.1f;
+    if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+        diffuseSTR -= 0.1f;
+
 
     /// ambient color
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && ambientLGT.r < 1.0f)
@@ -263,17 +271,19 @@ void render2(GLFWwindow *window)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    diffusePos.x = glm::cos(glfwGetTime()) * 5;
-    diffusePos.y = glm::cos(glfwGetTime()) * 5;
-    diffusePos.z = glm::sin(glfwGetTime()) * 5;
+    diffusePos.x = glm::cos(glfwGetTime()) * 3;
+    diffusePos.y = glm::cos(glfwGetTime()) * 0;
+    diffusePos.z = glm::sin(glfwGetTime()) * 3;
 
     model = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, 0.0f));
     view = glm::lookAt(cameraPos, cameraPos + cameraDirection, cameraUp);
     mvp = proj * view * model;
-
     glUniform3f(3, ambientLGT.r, ambientLGT.g, ambientLGT.b);
     glUniform1f(4, ambientSTR);
     glUniform3f(5, diffusePos.x, diffusePos.y, diffusePos.z);
+    glUniform1f(6, diffuseSTR);
+    glUniform3f(7, cameraPos.x, cameraPos.y, cameraPos.z);
+
     glUniformMatrix4fv(9, 1, GL_FALSE, value_ptr(model));
     glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(mvp));
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -281,6 +291,13 @@ void render2(GLFWwindow *window)
     model = glm::translate(mat4(1.0f), diffusePos);
     view = glm::lookAt(cameraPos, cameraPos + cameraDirection, cameraUp);
     mvp = proj * view * model;
+
+    glUniform3f(3, ambientLGT.r, ambientLGT.g, ambientLGT.b);
+    glUniform1f(4, ambientSTR);
+    glUniform3f(5, diffusePos.x, diffusePos.y, diffusePos.z);
+    glUniform1f(6, diffuseSTR);
+    glUniform3f(7, cameraPos.x, cameraPos.y, cameraPos.z);
+
     glUniformMatrix4fv(9, 1, GL_FALSE, value_ptr(model));
     glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(mvp));
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -487,7 +504,6 @@ int main()
     GLFWwindow *window = createWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
     GLuint prog = ShaderProgram("shaders/vert.glsl", "shaders/frag.glsl");
     glUseProgram(prog);
-
     prepareData();
     //genPositions();
 
